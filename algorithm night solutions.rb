@@ -13,14 +13,15 @@ def check_rows(arr, num)
 	end
 
 	return false if count != 9
-	return check_sudoku_rows(arr, num - 1)
+	return check_rows(arr, num - 1)
 end
 
 def check_columns(arr, num)
+	
 	return true if num == 0
 	count = 0
-
 	columns_array = arr.transpose
+
 	columns_array.each do |sub|
 		sub.each do |y|
 			if y == num
@@ -33,42 +34,70 @@ def check_columns(arr, num)
 	return check_columns(arr, num-1)
 end
 
-def check_boxes(arr, num)
-	return true if num == 0
-	grouped_array = []
-	arr.each do |sub|
-		sub.each_slice(3) do |y|
-			grouped_array << y
-		end
-	end
-	# p grouped_array
+def check_boxes(arr)
+
+	return true if arr == []
+
 	box = []
 	idx = 0
-	if grouped_array.length == 3
-		box = grouped_array
-	else
-		while idx < 9
-			box << grouped_array[idx] if idx % 3 == 0
-			idx += 3
-		end
+
+	while idx <= 2
+		box << arr[idx].slice!(0..2)
+		idx +=1
 	end
-	# p box
-	count = 0
-	box.each do |sub|
-		sub.each do |y|
-			if y == num
-				count +=1
+
+	#check for each number's existence only once in current box
+	num = 1
+	while num <= 9
+		count = 0
+		box.each do |sub|
+			sub.each do |y|
+				if y == num
+					count +=1
+				end
 			end
 		end
+		return false if count != 1
+		num +=1
 	end
-	# p count
-	return false if count != 1
-	return check_boxes(arr, num-1)
+
+	arr = arr.delete_if {|x| x == []}
+	return check_boxes(arr)
 end
 
+# valid and invalid board examples for testing
+ valid  =	[[5, 3, 4, 6, 7, 8, 9, 1, 2], 
+	         [6, 7, 2, 1, 9, 5, 3, 4, 8],
+	         [1, 9, 8, 3, 4, 2, 5, 6, 7],
+	        
+	         [8, 5, 9, 7, 6, 1, 4, 2, 3],
+	         [4, 2, 6, 8, 5, 3, 7, 9, 1],
+	         [7, 1, 3, 9, 2, 4, 8, 5, 6],
+	        
+	         [9, 6, 1, 5, 3, 7, 2, 8, 4],
+	         [2, 8, 7, 4, 1, 9, 6, 3, 5],
+	         [3, 4, 5, 2, 8, 6, 1, 7, 9]]
 
-check_boxes(arr, 9, 2)
 
+invalid =  [[5, 3, 4, 6, 7, 8, 9, 1, 2], 
+		        [6, 7, 2, 1, 9, 5, 3, 4, 8],
+		        [1, 9, 8, 3, 4, 2, 5, 6, 7],
+		        
+		        [8, 5, 9, 7, 6, 1, 4, 2, 3],
+		        [4, 2, 6, 8, 5, 3, 7, 9, 1],
+		        [7, 1, 3, 9, 2, 4, 8, 5, 6],
+		        
+		        [9, 6, 1, 5, 3, 7, 2, 8, 4],
+		        [2, 8, 7, 4, 1, 9, 6, 3, 5],
+		        [3, 4, 5, 2, 8, 6, 1, 7, 8]]
+
+check_rows(valid, 9) # => true
+check_columns(valid,9)# => true
+check_boxes(valid)# => true
+
+check_rows(invalid, 9) # => false
+check_columns(invalid, 9)# => false
+check_boes(invalid) # => false
 
 # function to return all .rb files within a directory
 def requiring_ruby(dir)
@@ -81,5 +110,3 @@ def requiring_ruby(dir)
 end
 
 requiring_ruby(Dir.pwd)
-
-
